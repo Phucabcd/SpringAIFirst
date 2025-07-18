@@ -28,8 +28,13 @@ public class ChatController {
 //       return chatService.chat(request);
 //    }
 
+//    @PostMapping("/chat")
+//    public ExpensenInto chat(@RequestBody ChatRequest request) {
+//        return chatService.chat(request);
+//    }
+
     @PostMapping("/chat")
-    public ExpensenInto chat(@RequestBody ChatRequest request) {
+    public String chat(@RequestBody ChatRequest request) {
         return chatService.chat(request);
     }
 

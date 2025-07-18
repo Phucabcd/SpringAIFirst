@@ -6,6 +6,10 @@ import ntp.springaifirst.dto.ExpensenInto;
 import ntp.springaifirst.dto.FilmInto;
 import org.apache.tomcat.util.http.fileupload.util.mime.MimeUtility;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -32,10 +36,20 @@ public class ChatService {
 
 
     private final ChatClient chatClient;
+    private final JdbcChatMemoryRepository chatMemoryRepository;
 
     //constructor
-    public ChatService(ChatClient.Builder builder) {
-        chatClient = builder.build();
+    public ChatService(ChatClient.Builder builder, JdbcChatMemoryRepository chatMemoryRepository) {
+        this.chatMemoryRepository = chatMemoryRepository;
+
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+                .chatMemoryRepository(chatMemoryRepository)
+                .maxMessages(20)
+                .build();
+
+        chatClient = builder
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .build();
     }
 
 //    public String chat(ChatRequest request) {
@@ -53,7 +67,7 @@ public class ChatService {
 //    }
 
 
-    public ExpensenInto chat(ChatRequest request) {
+    public String chat(ChatRequest request) {
         SystemMessage systemMessage = new SystemMessage("Bạn là một trợ lí AI của Phuc Nguyen" +
                 "Bạn sẽ giải đáp thắc mắc cho nhà tuyển dụng muốn biết thêm về tôi");
 
@@ -61,10 +75,14 @@ public class ChatService {
 
         Prompt prompt = new Prompt(systemMessage, userMessage);
 
+        String converstationId = "001";
+
         return chatClient
                 .prompt(prompt)
+//                .user("Do I have license to code?")
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, converstationId))
                 .call()
-                .entity(ExpensenInto.class);
+                .content();
     }
 
     //create for prompt
