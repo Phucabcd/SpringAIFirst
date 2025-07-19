@@ -38,6 +38,7 @@ public class ChatService {
     private final ChatClient chatClient;
     private final JdbcChatMemoryRepository chatMemoryRepository;
 
+
     //constructor
     public ChatService(ChatClient.Builder builder, JdbcChatMemoryRepository chatMemoryRepository) {
         this.chatMemoryRepository = chatMemoryRepository;
@@ -91,6 +92,8 @@ public class ChatService {
             .build();
 
     public List<BillItems> chatImage(MultipartFile file, String message) {
+        String converstationId = "002";
+
         Media media = Media.builder()
                 .mimeType(MimeTypeUtils.parseMimeType(file.getContentType()))
                 .data(file.getResource())
@@ -99,9 +102,11 @@ public class ChatService {
         return chatClient.prompt()
                 .options(chatOptions)
                 .system("Bạn là một nhân viên thu ngân")
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, converstationId))
                 .user(promptUserSpec -> promptUserSpec.media(media)
                 .text(message))
                 .call()
                 .entity(new ParameterizedTypeReference<List<BillItems>>() {});
     }
+
 }

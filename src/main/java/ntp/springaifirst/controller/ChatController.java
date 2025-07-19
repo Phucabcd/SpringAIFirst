@@ -18,10 +18,10 @@ public class ChatController {
     @Autowired
     ChatService chatService;
 
-//    @PostMapping("/chat")
-//    public Map<String, String> chat(@RequestBody ChatRequest request) {
-//        return Map.of("response", chatService.chat(request));
-//    }
+    @PostMapping("/chat")
+    public Map<String, String> chat(@RequestBody ChatRequest request) {
+        return Map.of("response", chatService.chat(request));
+    }
 
 //    @PostMapping("/chat")
 //    public List<FilmInto> chat(@RequestBody ChatRequest request) {
@@ -33,10 +33,10 @@ public class ChatController {
 //        return chatService.chat(request);
 //    }
 
-    @PostMapping("/chat")
-    public String chat(@RequestBody ChatRequest request) {
-        return chatService.chat(request);
-    }
+//    @PostMapping("/chat")
+//    public String chat(@RequestBody ChatRequest request) {
+//        return chatService.chat(request);
+//    }
 
 
 //    @PostMapping("/chat-image")
@@ -50,4 +50,5 @@ public class ChatController {
                         @RequestParam("message") String message) {
         return chatService.chatImage(file, message);
     }
+
 }
