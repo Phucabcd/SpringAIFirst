@@ -2,8 +2,7 @@ package ntp.springaifirst.controller;
 
 import ntp.springaifirst.dto.BillItems;
 import ntp.springaifirst.dto.ChatRequest;
-import ntp.springaifirst.dto.ExpensenInto;
-import ntp.springaifirst.dto.FilmInto;
+import ntp.springaifirst.entity.MessageMemory;
 import ntp.springaifirst.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -51,4 +51,13 @@ public class ChatController {
         return chatService.chatImage(file, message);
     }
 
+    @GetMapping("/history")
+    public List<MessageMemory> history() {
+        return chatService.history();
+    }
+
+    @GetMapping("/history/{id}")
+    public List<MessageMemory> history(@PathVariable("id") String id) {
+        return chatService.findHistoryById(id);
+    }
 }
