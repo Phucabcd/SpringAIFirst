@@ -7,6 +7,7 @@ import ntp.springaifirst.entity.MessageMemory;
 import ntp.springaifirst.enums.SystemModel;
 import ntp.springaifirst.enums.ToneStyle;
 import ntp.springaifirst.repo.MessageMemoryRepo;
+import ntp.springaifirst.tool.DateTimeTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -53,6 +54,7 @@ public class ChatService {
 
         chatClient = builder
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .defaultTools(new DateTimeTools())
                 .build();
     }
     //prompt setting
@@ -81,10 +83,12 @@ public class ChatService {
         Prompt prompt = new Prompt(systemMessage, userMessage);
 
         String converstationId = "001";
+//        String conversationId = UUID.randomUUID().toString();
 
         return chatClient
                 .prompt(prompt)
 //                .user("Do I have license to code?")
+//                .tools(new DateTimeTools()) //comment because have a constructor
                 .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, converstationId))
                 .call()
                 .content();
