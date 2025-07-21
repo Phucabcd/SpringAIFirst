@@ -2,9 +2,8 @@ package ntp.springaifirst.service;
 
 import ntp.springaifirst.dto.BillItems;
 import ntp.springaifirst.dto.ChatRequest;
-import ntp.springaifirst.dto.ExpensenInto;
-import ntp.springaifirst.dto.FilmInto;
-import org.apache.tomcat.util.http.fileupload.util.mime.MimeUtility;
+import ntp.springaifirst.entity.MessageMemory;
+import ntp.springaifirst.repo.MessageMemoryRepo;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -12,7 +11,6 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.content.Media;
@@ -22,8 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ChatService {
@@ -34,10 +32,11 @@ public class ChatService {
     //du lieu phuc tap nhu List dung .entity(new ParameterizedTypeReference<List<FilmInto>>() {});
 //END************************************************************
 
+    @Autowired
+    MessageMemoryRepo messageMemoryRepo;
 
     private final ChatClient chatClient;
     private final JdbcChatMemoryRepository chatMemoryRepository;
-
 
     //constructor
     public ChatService(ChatClient.Builder builder, JdbcChatMemoryRepository chatMemoryRepository) {
@@ -109,4 +108,11 @@ public class ChatService {
                 .entity(new ParameterizedTypeReference<List<BillItems>>() {});
     }
 
+    public List<MessageMemory> history(){
+        return messageMemoryRepo.findAll();
+    }
+
+    public List<MessageMemory> findHistoryById(String id) {
+        return messageMemoryRepo.findMemoryId(id);
+    }
 }
