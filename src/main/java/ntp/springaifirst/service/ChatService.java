@@ -1,8 +1,11 @@
 package ntp.springaifirst.service;
 
+import ntp.springaifirst.builder.PromptBuiler;
 import ntp.springaifirst.dto.BillItems;
 import ntp.springaifirst.dto.ChatRequest;
 import ntp.springaifirst.entity.MessageMemory;
+import ntp.springaifirst.enums.SystemModel;
+import ntp.springaifirst.enums.ToneStyle;
 import ntp.springaifirst.repo.MessageMemoryRepo;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -38,6 +41,7 @@ public class ChatService {
     private final ChatClient chatClient;
     private final JdbcChatMemoryRepository chatMemoryRepository;
 
+
     //constructor
     public ChatService(ChatClient.Builder builder, JdbcChatMemoryRepository chatMemoryRepository) {
         this.chatMemoryRepository = chatMemoryRepository;
@@ -51,6 +55,9 @@ public class ChatService {
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
     }
+    //prompt setting
+    String promptBuiler = PromptBuiler.builderPrompt(SystemModel.JOB_ASSISTANT,  ToneStyle.CASUAL);
+    String promptCashier = PromptBuiler.builderPrompt(SystemModel.CASHIER, ToneStyle.FRIENDLY);
 
 //    public String chat(ChatRequest request) {
 //        SystemMessage systemMessage = new SystemMessage("Bạn là một trợ lí AI của Phuc Nguyen" +
@@ -66,11 +73,9 @@ public class ChatService {
 //                .content();
 //    }
 
-
     public String chat(ChatRequest request) {
-        SystemMessage systemMessage = new SystemMessage("Bạn là một trợ lí AI của Phuc Nguyen" +
-                "Bạn sẽ giải đáp thắc mắc cho nhà tuyển dụng muốn biết thêm về tôi");
-
+        SystemMessage systemMessage = new SystemMessage(promptBuiler);
+        System.out.println("System Prompt: " + promptBuiler);
         UserMessage userMessage = new UserMessage(request.message());
 
         Prompt prompt = new Prompt(systemMessage, userMessage);
@@ -100,7 +105,7 @@ public class ChatService {
 
         return chatClient.prompt()
                 .options(chatOptions)
-                .system("Bạn là một nhân viên thu ngân")
+                .system(promptCashier)
                 .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, converstationId))
                 .user(promptUserSpec -> promptUserSpec.media(media)
                 .text(message))
